@@ -80,3 +80,31 @@ alter user  'root'@'localhost' identified by 'your_password';
 ​	查看ssh 是否启动   ps -e |grep ssh  有sshd,说明ssh服务已经启动
 
 ​	如果没有启动，输入"sudo service ssh start"
+
+## 通过mysql的客户端连接mysql数据库
+
+如果直接使用mysql的客户端就能连接到mysql服务器时，那恭喜你啦。下面介绍如何处理下方式
+
+1.mysql客户端连接不上时（丢包现象）
+
+netstat -ntpl 查看端口情况 ，启动mysql服务是  默认端口3306会被监听
+
+netstat -ntpl 查看端口丢包情况，在本人机器上是连接不上的，没有查看到3306端口丢包，但是我还是执行了
+
+iptables -F 清除防火墙中链中的规则
+
+然后进入mysql服务器上执行（目的是允许root用户远程操作）
+
+mysql> use mysql;
+
+mysql> update user set host = '%' where user = 'root';
+
+FLUSH PRIVILEGES
+
+2.假如上面操作还不行的话，我遇到的情况是 client does not support authentication...，已经不是丢包的原因了，那我们接下去的操作是
+
+1.mysql>  alter user 'root'@'%' identified with mysql_native_password by 'xxxxx';  (输入root 用户和其密码)
+
+2.mysql> flush privileges;
+
+这样就解决了这个问题
